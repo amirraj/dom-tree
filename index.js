@@ -1,18 +1,177 @@
+// const puppeteer = require("puppeteer");
+// const fs = require("fs");
+// const { getPriority } = require("os");
+
+// // const url =
+// //   "https://web.ics.purdue.edu/~gchopra/class/public/pages/webdesign/05_simple.html";
+
+//  //const url = "https://pubmed.ncbi.nlm.nih.gov/28683860/";
+
+// const url =
+//   "https://www.pubfacts.com/detail/33844180/Quality-of-primary-care-and-quality-of-life-from-the-point-of-view-of-older-patients-with-dizziness-";
+
+// // const url =
+// //   "https://trialsjournal.biomedcentral.com/articles/10.1186/s13063-018-2853-7";
+
+// let treeAr = [];
+
+// const getLinearAr = (node) => {
+//   if (node.children.length > 0) {
+//     for (let j = 0; j < node.children.length; j++) {
+//       getLinearAr(node.children[j]);
+//     }
+//   }
+
+//   treeAr.push({
+//     nodeName: node.nodeName,
+//     parentName: node.parentName,
+//     children: node.children.length,
+//     content: node.content,
+//     nodeVal: node.nodeVal,
+//     nodeScore: node.nodeScore,
+//     nodeFont: node.nodeFont,
+//     nodeFontSize: node.nodeFontSize,
+//     nodeStyle: node.nodeStyle,
+//   });
+// };
+
+// const optimizedValue = (node, isMax) => {
+//   if (node.children.length == 0) {
+//     return node.nodeScore;
+//   }
+
+//   let scores = [];
+//   if (isMax) {
+//     for (let j = 0; j < node.children.length; j++) {
+//       scores.push(optimizedValue(node.children[j]), false);
+//     }
+
+//     return Math.max(...scores);
+//   } else {
+//     for (let j = 0; j < node.children.length; j++) {
+//       scores.push(optimizedValue(node.children[j]), true);
+//     }
+
+//     return Math.min(...scores);
+//   }
+// };
+
+// const getTree = async () => {
+//   const browser = await puppeteer.launch({ headless: false });
+//   const page = await browser.newPage();
+
+//   treeAr = [];
+//   await page.goto(url, { waitUntil: "networkidle0" });
+
+//   const tree = await page.evaluate(async () => {
+//     let nodeValue = 0;
+//     let maxFontSize = 0;
+//     let textFromMaxFornt = '';
+//     let hTags = [];
+//     const getNodeTree = (node) => {
+//       if (node.hasChildNodes()) {
+//         let children = [];
+//         for (let j = 0; j < node.childNodes.length; j++) {
+//           const child = getNodeTree(node.childNodes[j]);
+//           if (child) children.push(child);
+//         }
+//         //console.log(getComputedStyle(node).fontSize);
+//         if(parseFloat(getComputedStyle(node).fontSize) > maxFontSize){
+//           maxFontSize = parseFloat(getComputedStyle(node).fontSize);
+//           textFromMaxFornt = node.outerText;
+//         }
+//         nodeValue++;
+//         let score = 0;
+//         let content = node.outerText || "";
+//         if (content) {
+//           const contentWords = content.split(" ");
+//           for (const word of contentWords) {
+//             if (word.trim()) {
+//               score++;
+//             }
+//           }
+//         }
+//         let tagCheck = node.nodeName;
+//         if(tagCheck == 'H1' || tagCheck == 'H2' || tagCheck == 'H3'){
+//           hTags.push({tag:tagCheck, text : node.outerText})
+//         }
+//         return {
+//           nodeName: node.nodeName,
+//           parentName: node.parentNode.nodeName,
+//           children: children,
+//           content: node.innerText || "",
+//           nodeVal: nodeValue,
+//           nodeScore: score,
+//           nodeFontSize: getComputedStyle(node).fontSize,
+//         };
+//       }
+
+//       return false;
+//     };
+//     const bodyText = document.querySelector("body");
+
+//     const nodeTree = await getNodeTree(bodyText);
+
+//     //return nodeTree;
+//     return hTags;
+//     //return textFromMaxFornt;
+//   });
+
+//   // console.log(tree);
+//   fs.writeFile("test.txt", JSON.stringify(tree), () => {});
+
+//   // const optimedNodeContent = optimizedValue(tree, true);
+//   // console.log(optimedNodeContent);
+
+//   // getLinearAr(tree);
+//   // // console.log(treeAr);
+
+//   // treeAr.sort((a, b) => {
+//   //   return b.nodeScore - a.nodeScore;
+//   // });
+
+//   // // console.log(treeAr);
+
+//   // fs.writeFile("test-trialsjournal.txt", JSON.stringify(treeAr), () => {});
+
+//   // const treeArlen = treeAr.length;
+//   // let mainContent = {};
+
+//   // for (let i = 1; i < treeArlen; i++) {
+//   //   const contentDiff = treeAr[i - 1].nodeScore - treeAr[i].nodeScore;
+//   //   if (contentDiff >= threshold) {
+//   //     mainContent = treeAr[i - 1];
+//   //     break;
+//   //   }
+//   // }
+
+//   // // console.log(mainContent);
+
+//   // mainArticleList.push({ ...mainContent, Link: url });
+//   // console.log(mainArticleList);
+
+//   // fs.writeFile("outputs.txt", JSON.stringify(mainArticleList), () => {});
+
+//   await browser.close();
+// };
+
+// getTree();
+
+
 const puppeteer = require("puppeteer");
 const fs = require("fs");
-const { getPriority } = require("os");
+const { spawn } = require("child_process");
 
 // const url =
 //   "https://web.ics.purdue.edu/~gchopra/class/public/pages/webdesign/05_simple.html";
 
- //const url = "https://pubmed.ncbi.nlm.nih.gov/28683860/";
-
-const url =
-  "https://www.pubfacts.com/detail/33844180/Quality-of-primary-care-and-quality-of-life-from-the-point-of-view-of-older-patients-with-dizziness-";
+// const url = "https://pubmed.ncbi.nlm.nih.gov/28683860/";
 
 // const url =
-//   "https://trialsjournal.biomedcentral.com/articles/10.1186/s13063-018-2853-7";
+//   "https://www.pubfacts.com/detail/33844180/Quality-of-primary-care-and-quality-of-life-from-the-point-of-view-of-older-patients-with-dizziness-";
 
+const url =
+  "https://trialsjournal.biomedcentral.com/articles/10.1186/s13063-018-2853-7";
 let treeAr = [];
 const mainArticleList = [];
 
@@ -47,6 +206,7 @@ const getLinearAr = (node) => {
     nodeName: node.nodeName,
     parentName: node.parentName,
     children: node.children.length,
+    childrenList: node.children,
     content: node.content,
     nodeVal: node.nodeVal,
     nodeScore: node.nodeScore,
@@ -55,6 +215,7 @@ const getLinearAr = (node) => {
     nodeStyle: node.nodeStyle,
   });
 };
+
 
 const optimizedValue = (node, isMax) => {
   if (node.children.length == 0) {
@@ -78,7 +239,7 @@ const optimizedValue = (node, isMax) => {
 };
 
 const getTree = async () => {
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
   treeAr = [];
@@ -86,9 +247,6 @@ const getTree = async () => {
 
   const tree = await page.evaluate(async () => {
     let nodeValue = 0;
-    let maxFontSize = 0;
-    let textFromMaxFornt = '';
-    let hTags = [];
     const getNodeTree = (node) => {
       if (node.hasChildNodes()) {
         let children = [];
@@ -96,11 +254,7 @@ const getTree = async () => {
           const child = getNodeTree(node.childNodes[j]);
           if (child) children.push(child);
         }
-        //console.log(getComputedStyle(node).fontSize);
-        if(parseFloat(getComputedStyle(node).fontSize) > maxFontSize){
-          maxFontSize = parseFloat(getComputedStyle(node).fontSize);
-          textFromMaxFornt = node.outerText;
-        }
+
         nodeValue++;
         let score = 0;
         let content = node.outerText || "";
@@ -112,10 +266,7 @@ const getTree = async () => {
             }
           }
         }
-        let tagCheck = node.nodeName;
-        if(tagCheck == 'H1' || tagCheck == 'H2' || tagCheck == 'H3'){
-          hTags.push({tag:tagCheck, text : node.outerText})
-        }
+
         return {
           nodeName: node.nodeName,
           parentName: node.parentNode.nodeName,
@@ -123,7 +274,9 @@ const getTree = async () => {
           content: node.innerText || "",
           nodeVal: nodeValue,
           nodeScore: score,
-          nodeFontSize: getComputedStyle(node).fontSize,
+          nodeFont: node.style.fontFamily,
+          nodeFontSize: node.style.fontSize,
+          nodeStyle: node.style,
         };
       }
 
@@ -133,45 +286,58 @@ const getTree = async () => {
 
     const nodeTree = await getNodeTree(bodyText);
 
-    //return nodeTree;
-    return hTags;
-    //return textFromMaxFornt;
+    return nodeTree;
   });
 
   // console.log(tree);
   fs.writeFile("test.txt", JSON.stringify(tree), () => {});
 
-  // const optimedNodeContent = optimizedValue(tree, true);
-  // console.log(optimedNodeContent);
-
-  // getLinearAr(tree);
+  getLinearAr(tree);
   // // console.log(treeAr);
 
-  // treeAr.sort((a, b) => {
-  //   return b.nodeScore - a.nodeScore;
-  // });
+  treeAr.sort((a, b) => {
+    return b.nodeScore - a.nodeScore;
+  });
 
   // // console.log(treeAr);
-
   // fs.writeFile("test-trialsjournal.txt", JSON.stringify(treeAr), () => {});
 
-  // const treeArlen = treeAr.length;
-  // let mainContent = {};
+  const treeArlen = treeAr.length;
 
-  // for (let i = 1; i < treeArlen; i++) {
-  //   const contentDiff = treeAr[i - 1].nodeScore - treeAr[i].nodeScore;
-  //   if (contentDiff >= threshold) {
-  //     mainContent = treeAr[i - 1];
-  //     break;
-  //   }
-  // }
+  const contentDiffAr = [];
 
-  // // console.log(mainContent);
+  for (let i = 0; i < treeArlen - 1; i++) {
+    const contentDiff = treeAr[i].nodeScore - treeAr[i + 1].nodeScore;
+    contentDiffAr.push(contentDiff);
+  }
 
-  // mainArticleList.push({ ...mainContent, Link: url });
-  // console.log(mainArticleList);
+  const maxContentDiffIndex = contentDiffAr.reduce(
+    (bestIndexSoFar, currentlyTestedValue, currentlyTestedIndex, array) =>
+      currentlyTestedValue > array[bestIndexSoFar]
+        ? currentlyTestedIndex
+        : bestIndexSoFar,
+    0
+  );
 
-  // fs.writeFile("outputs.txt", JSON.stringify(mainArticleList), () => {});
+  const filename = "input-file.txt";
+
+  // console.log(contentDiffAr);
+  const mainContent = treeAr[maxContentDiffIndex];
+
+  const title = '';
+  for(let i =0; i<mainContent.childrenList.length;i++){
+  
+    console.log(mainContent.childrenList[i].children.length);
+  }
+  fs.writeFile(filename, title, () => {});
+
+  // example1 = "My name is Wolfgang and I live in Berlin";
+
+  // const childPython = spawn("python", ["script.py", filename]);
+
+  // childPython.stdout.on("data", (data) => {
+  //   console.log(`${data}`);
+  // });
 
   await browser.close();
 };
