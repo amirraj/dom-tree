@@ -1,199 +1,20 @@
-// const puppeteer = require("puppeteer");
-// const fs = require("fs");
-// const { getPriority } = require("os");
-
-// // const url =
-// //   "https://web.ics.purdue.edu/~gchopra/class/public/pages/webdesign/05_simple.html";
-
-//  //const url = "https://pubmed.ncbi.nlm.nih.gov/28683860/";
-
-// const url =
-//   "https://www.pubfacts.com/detail/33844180/Quality-of-primary-care-and-quality-of-life-from-the-point-of-view-of-older-patients-with-dizziness-";
-
-// // const url =
-// //   "https://trialsjournal.biomedcentral.com/articles/10.1186/s13063-018-2853-7";
-
-// let treeAr = [];
-
-// const getLinearAr = (node) => {
-//   if (node.children.length > 0) {
-//     for (let j = 0; j < node.children.length; j++) {
-//       getLinearAr(node.children[j]);
-//     }
-//   }
-
-//   treeAr.push({
-//     nodeName: node.nodeName,
-//     parentName: node.parentName,
-//     children: node.children.length,
-//     content: node.content,
-//     nodeVal: node.nodeVal,
-//     nodeScore: node.nodeScore,
-//     nodeFont: node.nodeFont,
-//     nodeFontSize: node.nodeFontSize,
-//     nodeStyle: node.nodeStyle,
-//   });
-// };
-
-// const optimizedValue = (node, isMax) => {
-//   if (node.children.length == 0) {
-//     return node.nodeScore;
-//   }
-
-//   let scores = [];
-//   if (isMax) {
-//     for (let j = 0; j < node.children.length; j++) {
-//       scores.push(optimizedValue(node.children[j]), false);
-//     }
-
-//     return Math.max(...scores);
-//   } else {
-//     for (let j = 0; j < node.children.length; j++) {
-//       scores.push(optimizedValue(node.children[j]), true);
-//     }
-
-//     return Math.min(...scores);
-//   }
-// };
-
-// const getTree = async () => {
-//   const browser = await puppeteer.launch({ headless: false });
-//   const page = await browser.newPage();
-
-//   treeAr = [];
-//   await page.goto(url, { waitUntil: "networkidle0" });
-
-//   const tree = await page.evaluate(async () => {
-//     let nodeValue = 0;
-//     let maxFontSize = 0;
-//     let textFromMaxFornt = '';
-//     let hTags = [];
-//     const getNodeTree = (node) => {
-//       if (node.hasChildNodes()) {
-//         let children = [];
-//         for (let j = 0; j < node.childNodes.length; j++) {
-//           const child = getNodeTree(node.childNodes[j]);
-//           if (child) children.push(child);
-//         }
-//         //console.log(getComputedStyle(node).fontSize);
-//         if(parseFloat(getComputedStyle(node).fontSize) > maxFontSize){
-//           maxFontSize = parseFloat(getComputedStyle(node).fontSize);
-//           textFromMaxFornt = node.outerText;
-//         }
-//         nodeValue++;
-//         let score = 0;
-//         let content = node.outerText || "";
-//         if (content) {
-//           const contentWords = content.split(" ");
-//           for (const word of contentWords) {
-//             if (word.trim()) {
-//               score++;
-//             }
-//           }
-//         }
-//         let tagCheck = node.nodeName;
-//         if(tagCheck == 'H1' || tagCheck == 'H2' || tagCheck == 'H3'){
-//           hTags.push({tag:tagCheck, text : node.outerText})
-//         }
-//         return {
-//           nodeName: node.nodeName,
-//           parentName: node.parentNode.nodeName,
-//           children: children,
-//           content: node.innerText || "",
-//           nodeVal: nodeValue,
-//           nodeScore: score,
-//           nodeFontSize: getComputedStyle(node).fontSize,
-//         };
-//       }
-
-//       return false;
-//     };
-//     const bodyText = document.querySelector("body");
-
-//     const nodeTree = await getNodeTree(bodyText);
-
-//     //return nodeTree;
-//     return hTags;
-//     //return textFromMaxFornt;
-//   });
-
-//   // console.log(tree);
-//   fs.writeFile("test.txt", JSON.stringify(tree), () => {});
-
-//   // const optimedNodeContent = optimizedValue(tree, true);
-//   // console.log(optimedNodeContent);
-
-//   // getLinearAr(tree);
-//   // // console.log(treeAr);
-
-//   // treeAr.sort((a, b) => {
-//   //   return b.nodeScore - a.nodeScore;
-//   // });
-
-//   // // console.log(treeAr);
-
-//   // fs.writeFile("test-trialsjournal.txt", JSON.stringify(treeAr), () => {});
-
-//   // const treeArlen = treeAr.length;
-//   // let mainContent = {};
-
-//   // for (let i = 1; i < treeArlen; i++) {
-//   //   const contentDiff = treeAr[i - 1].nodeScore - treeAr[i].nodeScore;
-//   //   if (contentDiff >= threshold) {
-//   //     mainContent = treeAr[i - 1];
-//   //     break;
-//   //   }
-//   // }
-
-//   // // console.log(mainContent);
-
-//   // mainArticleList.push({ ...mainContent, Link: url });
-//   // console.log(mainArticleList);
-
-//   // fs.writeFile("outputs.txt", JSON.stringify(mainArticleList), () => {});
-
-//   await browser.close();
-// };
-
-// getTree();
-
-
 const puppeteer = require("puppeteer");
 const fs = require("fs");
-const { spawn } = require("child_process");
+const { PythonShell } = require("python-shell");
 
 // const url =
 //   "https://web.ics.purdue.edu/~gchopra/class/public/pages/webdesign/05_simple.html";
 
 // const url = "https://pubmed.ncbi.nlm.nih.gov/28683860/";
 
-// const url =
-//   "https://www.pubfacts.com/detail/33844180/Quality-of-primary-care-and-quality-of-life-from-the-point-of-view-of-older-patients-with-dizziness-";
-
 const url =
-  "https://trialsjournal.biomedcentral.com/articles/10.1186/s13063-018-2853-7";
+  "https://www.pubfacts.com/detail/33844180/Quality-of-primary-care-and-quality-of-life-from-the-point-of-view-of-older-patients-with-dizziness-";
+
+// const url =
+//   "https://trialsjournal.biomedcentral.com/articles/10.1186/s13063-018-2853-7";
+
 let treeAr = [];
 const mainArticleList = [];
-
-const threshold = 300;
-const siteList = [
-  "https://pubmed.ncbi.nlm.nih.gov/24204642",
-  "https://pubmed.ncbi.nlm.nih.gov/25907703",
-  "https://pubmed.ncbi.nlm.nih.gov/27590181",
-  "https://pubmed.ncbi.nlm.nih.gov/28143799",
-  "https://pubmed.ncbi.nlm.nih.gov/29769577",
-  "https://pubmed.ncbi.nlm.nih.gov/31930323",
-  "https://pubmed.ncbi.nlm.nih.gov/31930323",
-  "https://pubmed.ncbi.nlm.nih.gov/32378801",
-  "https://pubmed.ncbi.nlm.nih.gov/32512530",
-  "https://pubmed.ncbi.nlm.nih.gov/32853038",
-  "https://pubmed.ncbi.nlm.nih.gov/32868092",
-  "https://pubmed.ncbi.nlm.nih.gov/32924089",
-  "https://pubmed.ncbi.nlm.nih.gov/33085084",
-  "https://pubmed.ncbi.nlm.nih.gov/33130203",
-  "https://pubmed.ncbi.nlm.nih.gov/33139015",
-  "https://pubmed.ncbi.nlm.nih.gov/33537331",
-];
 
 const getLinearAr = (node) => {
   if (node.children.length > 0) {
@@ -205,8 +26,8 @@ const getLinearAr = (node) => {
   treeAr.push({
     nodeName: node.nodeName,
     parentName: node.parentName,
-    children: node.children.length,
-    childrenList: node.children,
+    children: node.children,
+    childrenCount: node.children.length,
     content: node.content,
     nodeVal: node.nodeVal,
     nodeScore: node.nodeScore,
@@ -216,26 +37,20 @@ const getLinearAr = (node) => {
   });
 };
 
-
-const optimizedValue = (node, isMax) => {
-  if (node.children.length == 0) {
-    return node.nodeScore;
-  }
-
-  let scores = [];
-  if (isMax) {
-    for (let j = 0; j < node.children.length; j++) {
-      scores.push(optimizedValue(node.children[j]), false);
+const clearNames = (names) => {
+  startIndex = names.indexOf("[");
+  endIndex = names.indexOf("]");
+  const nameSection = names.slice(startIndex + 1, endIndex);
+  if (nameSection.length > 1) {
+    const filteredListSplit = nameSection.split(",");
+    const authorNames = [];
+    for (const name of filteredListSplit) {
+      const nameFiltered = name.replace(/'/g, "");
+      authorNames.push(nameFiltered.trim());
     }
-
-    return Math.max(...scores);
-  } else {
-    for (let j = 0; j < node.children.length; j++) {
-      scores.push(optimizedValue(node.children[j]), true);
-    }
-
-    return Math.min(...scores);
+    return authorNames;
   }
+  return "";
 };
 
 const getTree = async () => {
@@ -244,6 +59,16 @@ const getTree = async () => {
 
   treeAr = [];
   await page.goto(url, { waitUntil: "networkidle0" });
+
+  // Look for expandable sections and click them.
+  await page.evaluate(() => {
+    const aTags = document.querySelectorAll("a");
+    aTags.forEach((tag) => {
+      if (tag.outerText == "[…]") {
+        tag.click();
+      }
+    });
+  });
 
   const tree = await page.evaluate(async () => {
     let nodeValue = 0;
@@ -319,25 +144,44 @@ const getTree = async () => {
     0
   );
 
-  const filename = "input-file.txt";
-
-  // console.log(contentDiffAr);
+  // Take one third of the mainContent and write it in a file for inference.
+  const filename = "main text.txt";
   const mainContent = treeAr[maxContentDiffIndex];
-
-  const title = '';
-  for(let i =0; i<mainContent.childrenList.length;i++){
-  
-    console.log(mainContent.childrenList[i].children.length);
+  const subSectionCnt = Math.floor(mainContent.childrenCount / 3);
+  let subSection = "";
+  for (let i = 0; i < subSectionCnt; i++) {
+    subSection += mainContent.children[i].content + " ";
   }
-  fs.writeFile(filename, title, () => {});
+ 
+  treeAr = []
+  getLinearAr(mainContent);
+  for(let i =0; i< treeAr.length ; i++){
+    if(treeAr[i].nodeName == 'H3'){
+      console.log(treeAr[i].content);
+    }
+  }
+  fs.writeFile(filename, JSON.stringify(mainContent), () => {});
 
-  // example1 = "My name is Wolfgang and I live in Berlin";
+  // Call the python script and get the results back.
+  const options = {
+    mode: "text",
+    args: [filename],
+  };
 
-  // const childPython = spawn("python", ["script.py", filename]);
+  const getNames = async () => {
+    const names = new Promise((resolve, reject) => {
+      PythonShell.run("script.py", options, (err, res) => {
+        resolve(res);
+      });
+    });
 
-  // childPython.stdout.on("data", (data) => {
-  //   console.log(`${data}`);
-  // });
+    const obtainedNames = await names;
+    return String(obtainedNames);
+  };
+
+  // const names = await getNames();
+  // const authornames = clearNames(names);
+  // console.log(authornames);
 
   await browser.close();
 };
