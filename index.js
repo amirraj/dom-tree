@@ -1,17 +1,17 @@
 const puppeteer = require("puppeteer");
 const fs = require("fs");
-const { PythonShell } = require("python-shell");
+//const { PythonShell } = require("python-shell");
 
 // const url =
 //   "https://web.ics.purdue.edu/~gchopra/class/public/pages/webdesign/05_simple.html";
 
-// const url = "https://pubmed.ncbi.nlm.nih.gov/28683860/";
-
-const url =
-  "https://www.pubfacts.com/detail/33844180/Quality-of-primary-care-and-quality-of-life-from-the-point-of-view-of-older-patients-with-dizziness-";
+ const url = "https://pubmed.ncbi.nlm.nih.gov/28683860/";
+ //const url = "https://www.pubpharm.de/vufind/Record/NLM323079598";
 
 // const url =
-//   "https://trialsjournal.biomedcentral.com/articles/10.1186/s13063-018-2853-7";
+//   "https://www.pubfacts.com/detail/33844180/Quality-of-primary-care-and-quality-of-life-from-the-point-of-view-of-older-patients-with-dizziness-";
+
+//const url = "https://trialsjournal.biomedcentral.com/articles/10.1186/s13063-018-2853-7";
 
 let treeAr = [];
 const mainArticleList = [];
@@ -155,12 +155,14 @@ const getTree = async () => {
  
   treeAr = []
   getLinearAr(mainContent);
+  let titles = {H1:[],H2:[],H3:[]}
   for(let i =0; i< treeAr.length ; i++){
-    if(treeAr[i].nodeName == 'H3'){
-      console.log(treeAr[i].content);
+    if(treeAr[i].nodeName == 'H3' || treeAr[i].nodeName == 'H2' || treeAr[i].nodeName == 'H1'){
+      titles[treeAr[i].nodeName].push(treeAr[i].content);
+      //console.log(treeAr[i].content);
     }
   }
-  fs.writeFile(filename, JSON.stringify(mainContent), () => {});
+  fs.writeFile(filename, JSON.stringify(titles), () => {});
 
   // Call the python script and get the results back.
   const options = {
