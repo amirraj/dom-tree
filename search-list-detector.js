@@ -3,12 +3,17 @@ const fs = require("fs");
 
 const url = "https://pubmed.ncbi.nlm.nih.gov/?term=karen";
 
-function convert(data){
+function convert(data) {
     var myMap = {}
     data.forEach(el => myMap[el] = myMap[el] != undefined ? myMap[el] + 1 : 1);
-    return Object.keys(myMap).map(k => {return {name: k, count: myMap[k]}})
-  }
+    return myMap;
+}
 
+function convert_reverse(data) {
+    var myMap = {}
+    Object.keys(data).forEach(el => myMap[data[el]] = myMap[data[el]] != undefined ? [...myMap[data[el]],el] : [el]);
+    return Object.keys(myMap).map(k => { return { count: k, classes: myMap[k] } })
+}
 const getListPattern = async () => {
     const browser = await puppeteer.launch({
         headless: false,
@@ -17,30 +22,17 @@ const getListPattern = async () => {
     });
     const page = await browser.newPage();
     await page.goto(url);
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(3000);
 
     const classElements = await page.evaluate(
         () => {
-            // var allClasses = [];
-            // var allElements = document.querySelectorAll('*');
-
-            // for (var i = 0; i < allElements.length; i++) {
-            //     var classes = allElements[i].className.toString().split(/\s+/);
-            //     for (var j = 0; j < classes.length; j++) {
-            //         var cls = classes[j];
-            //         if (cls && allClasses.indexOf(cls) === -1)
-            //             allClasses.push(cls);
-            //     }
-            // }
-
-            // return allClasses;
-            //console.log(allClasses);
             return [].concat(...[...document.querySelectorAll('*')].map(elt => [...elt.classList]));
         }
     )
-   
-    fs.writeFileSync("class-names.txt", JSON.stringify(convert(classElements)));
 
+    var freqToClass = convert_reverse(convert(classElements));
+    fs.writeFileSync("frequency to classes.txt", JSON.stringify(convert_reverse(convert(classElements))));
+    freqToClass.map(obj=>console.log(`${obj.count} : ${obj.classes.length}`));
     await browser.close();
 };
 getListPattern();
